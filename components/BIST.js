@@ -10,7 +10,7 @@ const BIST = () => {
                 method: 'GET',
                 headers: {
                     "content-type": "application/json",
-                    "authorization": "apikey 3HS07jD2MtstjfOkuxsw2A:6ZtSt2wk5HMIp5Bx5dAhAd"
+                    "authorization": "yourkey"
                 },
             };
 
