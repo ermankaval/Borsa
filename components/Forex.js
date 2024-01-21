@@ -11,6 +11,7 @@ const Main = () => {
             const options = {
                 method: 'GET',
                 headers: {
+                    // 'X-RapidAPI-Key': process.env.REACT_APP_RAPIDAPI_KEY,
                     'X-RapidAPI-Key': '40f1e38267msh9bfd6c758207d2ap1b4805jsnc396995c1f69',
                     'X-RapidAPI-Host': 'exchange-rate-by-api-ninjas.p.rapidapi.com',
                 },
@@ -18,6 +19,8 @@ const Main = () => {
 
             const response = await fetch(url, options);
             const result = await response.json();
+            console.log(result)
+
 
             setState({ pair, rate: result.exchange_rate, loading: false });
         } catch (error) {

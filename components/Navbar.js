@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { BiSearch, BiMenu } from 'react-icons/bi';
-// import { useWishlist } from './WishlistContext';
 import Logo from './Logo';
+import { useAppContext } from './context';
 
 const Navbar = () => {
+    const { state } = useAppContext();
     const [scrolled, setScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     // const { likedMoviesCount } = useWishlist();
@@ -61,9 +62,8 @@ const Navbar = () => {
                         </Link>
                     </li>
                     <li className='headerLink'>
-                        <Link href="/MyList">
-                            {/* <span className={`text-white ${scrolled ? 'hover:text-gray-300' : 'hover:text-gray-800'}`}>My List ({likedMoviesCount}) */}
-                            <span className={`text-white ${scrolled ? 'hover:text-gray-300' : 'hover:text-gray-800'}`}>Favorilerim</span>
+                        <Link href="/TrackingListPage">
+                            <span className={`text-white ${scrolled ? 'hover:text-gray-300' : 'hover:text-gray-800'}`}>Takip Listem ({state.trackedCount})</span>
                         </Link>
                     </li>
                 </ul>
@@ -97,7 +97,7 @@ const Navbar = () => {
                         <Link href="/MyList">
                             <span className={`text-white ${scrolled ? 'hover:text-gray-300' : 'hover:text-gray-800'}`}>
                                 {/* My List ({likedMoviesCount}) */}
-                                Favorilerim
+                                Takip Listem ({state.trackedCount})
                             </span>
                         </Link>
                     </li>
