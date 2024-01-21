@@ -94,9 +94,9 @@ const Navbar = () => {
                         </Link>
                     </li>
                     <li onClick={handleMobileMenuItemClick}>
-                        <Link href="/MyList">
+                        <Link href="/TrackingListPage">
                             <span className={`text-white ${scrolled ? 'hover:text-gray-300' : 'hover:text-gray-800'}`}>
-                                {/* My List ({likedMoviesCount}) */}
+
                                 Takip Listem ({state.trackedCount})
                             </span>
                         </Link>

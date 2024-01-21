@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from './context';
+import isEqual from 'lodash/isEqual';
 
 const BIST = () => {
     const { state, dispatch } = useAppContext();
     const [coin, setCoin] = useState({ quotes: [] });
     const [filterLetter, setFilterLetter] = useState(null);
     const [itemsPerPage, setItemsPerPage] = useState(10);
-    const [trackedCount, setTrackedCount] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
 
     const fetchData = async () => {
         try {
@@ -49,10 +50,11 @@ const BIST = () => {
             const matchesSearchTerm = !searchTerm || quote.code.toLowerCase().includes(searchTerm.toLowerCase());
             return matchesFilterLetter && matchesSearchTerm;
         });
-
-        // Filtrelenmiş hisseleri ayarla
-        setCoin({ quotes: filteredQuotes });
-    }, [filterLetter, searchTerm]);
+        if (!isEqual(filteredQuotes, coin.quotes)) {
+            // Filtrelenmiş hisseleri ayarla
+            setCoin({ quotes: filteredQuotes });
+        }
+    }, [filterLetter, searchTerm, coin.quotes]);
 
     const filterByLetter = (letter) => {
         setFilterLetter(letter);
@@ -63,24 +65,22 @@ const BIST = () => {
             type: 'ADD_TO_TRACKING_LIST',
             payload: quote
         });
-        // setTrackedCount((prevCount) => prevCount + 1);
     };
 
-
-    const removeFromTrackingList = (code) => {
+    const removeFromTrackingList = (quote) => {
         dispatch({
             type: 'REMOVE_FROM_TRACKING_LIST',
             payload: quote
         });
-        // setTrackedCount((prevCount) => prevCount - 1);
     };
 
     const handleItemsPerPageChange = (e) => {
         setItemsPerPage(parseInt(e.target.value, 10));
+        setCurrentPage(1); // Reset current page when items per page changes
     };
 
     return (
-        <div className="container mx-auto mt-4">
+        <div className="container mx-auto mt-4 overflow-x-auto">
             <h2 className="text-2xl font-bold mb-4">Canlı Borsa</h2>
 
             {/* Arama kutusu */}
@@ -95,14 +95,14 @@ const BIST = () => {
             </div>
 
             {/* Filter buttons */}
-            <div className="flex mb-4">
+            <div className="flex flex-wrap mb-4">
                 {[...Array(26)].map((_, index) => (
                     <button
                         key={index}
                         className={`flex-1 p-2 border-2 border-gray-300 ${filterLetter === String.fromCharCode('a'.charCodeAt(0) + index)
                             ? 'bg-gray-300'
                             : 'hover:bg-gray-100'
-                            } transform hover:scale-105 transition-transform`}
+                            } transform hover:scale-105 transition-transform mb-2`}
                         style={{
                             backgroundColor: filterLetter === String.fromCharCode('a'.charCodeAt(0) + index) ? 'rgba(169, 169, 169, 0.3)' : '',
                             borderColor: 'rgba(169, 169, 169, 0.6)',
@@ -133,58 +133,60 @@ const BIST = () => {
             </div>
 
             {/* Table */}
-            <table className="min-w-full border">
-                <thead>
-                    <tr>
-                        <th className="border bg-gray-200 p-2 text-center">+</th>
-                        <th className="border bg-gray-200 p-2 text-center">Code</th>
-                        <th className="border bg-gray-200 p-2 text-center">Last Price</th>
-                        <th className="border bg-gray-200 p-2 text-center">Max Price</th>
-                        <th className="border bg-gray-200 p-2 text-center">Min Price</th>
-                        <th className="border bg-gray-200 p-2 text-center">%</th>
-                        <th className="border bg-gray-200 p-2 text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {coin.quotes.map((quote, index) => (
-                        <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : ''}>
-                            <td className="border p-2 text-center text-sm">
-                                <button
-                                    className="ml-2 p-1 bg-blue-500 text-white rounded hover:bg-blue-700"
-                                    onClick={() => addToTrackingList(quote)}
-                                >
-                                    +
-                                </button>
-                            </td>
-                            <td className="border p-2 text-center text-sm">
-                                {quote.rate < 0 ? (
-                                    <>
-                                        {quote.code || 'Unknown'}
-                                        <span className="text-red-500 ml-1">&#9660;</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        {quote.code || 'Unknown'}
-                                        <span className="text-green-500 ml-1">&#9650;</span>
-                                    </>
-                                )}
-                            </td>
-                            <td className="border p-2 text-right text-sm pr-10">{(quote.lastprice || 0).toFixed(2)}</td>
-                            <td className="border p-2 text-right text-sm pr-10">{(quote.max || 0).toFixed(2)}</td>
-                            <td className="border p-2 text-right text-sm pr-10">{(quote.min || 0).toFixed(2)}</td>
-                            <td className="border p-2 text-right text-sm pr-10">{(quote.rate || 0).toFixed(2)}</td>
-                            <td className="border p-2 text-center text-sm pr-10">
-                                <button
-                                    className="p-1 bg-red-500 text-white rounded hover:bg-red-700"
-                                    onClick={() => removeFromTrackingList(quote)}
-                                >
-                                    -
-                                </button>
-                            </td>
+            <div className="overflow-x-auto">
+                <table className="min-w-full table-auto">
+                    <thead>
+                        <tr>
+                            <th className="bg-gray-200 p-2 text-center">+</th>
+                            <th className="bg-gray-200 p-2 text-center">Code</th>
+                            <th className="bg-gray-200 p-2 text-center">Last Price</th>
+                            <th className="bg-gray-200 p-2 text-center">Max Price</th>
+                            <th className="bg-gray-200 p-2 text-center">Min Price</th>
+                            <th className="bg-gray-200 p-2 text-center">%</th>
+                            <th className="bg-gray-200 p-2 text-center">Actions</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {coin.quotes.map((quote, index) => (
+                            <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : ''}>
+                                <td className="p-2 text-center text-sm">
+                                    <button
+                                        className="p-1 bg-blue-500 text-white rounded hover:bg-blue-700"
+                                        onClick={() => addToTrackingList(quote)}
+                                    >
+                                        +
+                                    </button>
+                                </td>
+                                <td className="p-2 text-center text-sm">
+                                    {quote.rate < 0 ? (
+                                        <>
+                                            {quote.code || 'Unknown'}
+                                            <span className="text-red-500 ml-1">&#9660;</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            {quote.code || 'Unknown'}
+                                            <span className="text-green-500 ml-1">&#9650;</span>
+                                        </>
+                                    )}
+                                </td>
+                                <td className="p-2 text-right text-sm pr-10">{(quote.lastprice || 0).toFixed(2)}</td>
+                                <td className="p-2 text-right text-sm pr-10">{(quote.max || 0).toFixed(2)}</td>
+                                <td className="p-2 text-right text-sm pr-10">{(quote.min || 0).toFixed(2)}</td>
+                                <td className="p-2 text-right text-sm pr-10">{(quote.rate || 0).toFixed(2)}</td>
+                                <td className="p-2 text-center text-sm pr-10">
+                                    <button
+                                        className="p-1 bg-red-500 text-white rounded hover:bg-red-700"
+                                        onClick={() => removeFromTrackingList(quote)}
+                                    >
+                                        -
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };
