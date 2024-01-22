@@ -1,7 +1,7 @@
 import { Inter } from 'next/font/google'
 import Head from 'next/head'
 import Navbar from '@/components/Navbar'
-import Forex from '@/components/Forex'
+import Forex3 from '@/components/Forex3'
 // import BIST from '@/components/BIST'
 import BIST2 from '@/components/BIST2'
 import Gold from '@/components/Gold'
@@ -34,8 +34,8 @@ export default function Home() {
       {/* <iframe src="https://api.genelpara.com/iframe/?symbol=para-birimleri&pb=XU100,USD,EUR,GA,BTC&stil=stil-1&renk=beyaz" title="Döviz ve Altın Fiyatları" frameborder="0" width="1000" height="70" style={{ width: '1000px', height: '70px' }}></iframe> */}
 
 
-      {/* <Forex /> */}
-      <BIST_CollectAPI_2 />
+      <Forex3 />
+      {/* <BIST_CollectAPI_2 /> */}
       {/* <CoinList /> */}
       {/* <Gold /> */}
     </>

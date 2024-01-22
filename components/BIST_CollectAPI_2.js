@@ -16,7 +16,9 @@ const BIST = () => {
             const options = {
                 method: 'GET',
                 headers: {
-                    'authorization': 'apikey 2KPeyEBBXoLABHUUSN92eh:1xS2pxDsaklaQZg5RQ40Hw',
+                    // 'authorization': 'apikey 2KPeyEBBXoLABHUUSN92eh:1xS2pxDsaklaQZg5RQ40Hw',
+                    'authorization': 'apikey 3HS07jD2MtstjfOkuxsw2A:6ZtSt2wk5HMIp5Bx5dAhAd', /* ermandilekbuse */
+
                     'content-type': 'application/json',
                 },
             };
