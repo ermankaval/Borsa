@@ -28,9 +28,10 @@ export default function Home() {
       `}</style>
 
       <Navbar />
+      {/* <BIST_CollectAPI_2 /> */}
       <Forex3 />
       <Forex4 />
-      {/* <BIST_CollectAPI_2 /> */}
+
       {/* <CoinList /> */}
       {/* <LiveChart /> */}
 

@@ -3,9 +3,9 @@ import React, { useState, useEffect } from 'react';
 const Main = () => {
     const [currencyData, setCurrencyData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(() => 10);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [hoveredRow, setHoveredRow] = useState(null);
-    const [filterValue, setFilterValue] = useState('all'); // 'all', 'rising', 'falling'
+    const [filterOption, setFilterOption] = useState('all'); // 'all', 'rising', 'falling'
 
     const fetchData = async () => {
         try {
@@ -39,21 +39,18 @@ const Main = () => {
         fetchData();
     }, []);
 
-    useEffect(() => {
-        // localStorage.setItem('itemsPerPage', itemsPerPage.toString());
-    }, [itemsPerPage]);
-
     const filteredData = currencyData.filter(currency => currency.currency.toLowerCase() !== 'update_date');
 
-    // Apply filtering based on the selected filter value
     const filteredAndSortedData = filteredData.filter(currency => {
-        if (filterValue === 'rising') {
-            return parseFloat(currency.change) > 0;
-        } else if (filterValue === 'falling') {
-            return parseFloat(currency.change) < 0;
+        const changeValue = currency.change;
+        if (filterOption === 'rising') {
+            return !changeValue.includes('-');
+        } else if (filterOption === 'falling') {
+            return changeValue.includes('-');
         }
         return true; // 'all' or unknown filter value
     });
+
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -72,9 +69,38 @@ const Main = () => {
     };
 
     const handleFilterChange = (e) => {
-        setFilterValue(e.target.value);
+        setFilterOption(e.target.value);
         setCurrentPage(1);
     };
+
+    const rowsToRender = currentItems.map((currency, index) => {
+        return (
+            <tr
+                key={index}
+                className={`
+                cursor-pointer
+                ${index % 2 === 0 ? 'bg-gray-50' : ''}
+                ${hoveredRow === index ? 'bg-gray-200' : ''}
+            `}
+                onMouseEnter={() => handleRowHover(index)}
+                onMouseLeave={() => handleRowHover(null)}
+            >
+                <td className="py-2 px-4 border-b text-center">{currency.currency}</td>
+                <td className="py-2 px-4 border-b text-center">{currency.rate}</td>
+                <td className={`py-2 px-4 border-b text-center`}>
+                    {currency.change}
+                </td>
+                <td className="py-2 px-4 border-b text-center">
+                    {currency.change.includes('-') ? (
+                        <span className="text-red-500">&#9660;</span> // Red triangle for negative change
+                    ) : (
+                        <span className="text-green-500">&#9650;</span> // Green triangle for non-negative change
+                    )}
+                </td>
+            </tr>
+        );
+    });
+
 
     return (
         <div className="container mx-auto mt-4 h-screen w-full lg:w-1/2">
@@ -90,46 +116,32 @@ const Main = () => {
                     <option value={20}>20</option>
                     <option value={30}>30</option>
                 </select>
+
                 <span className="text-lg font-semibold">Filtrele: </span>
                 <select
                     className="border p-2 rounded-md"
-                    value={filterValue}
+                    value={filterOption}
                     onChange={handleFilterChange}
                 >
                     <option value="all">Hepsi</option>
                     <option value="rising">Değeri Yükselenler</option>
                     <option value="falling">Değeri Düşenler</option>
                 </select>
+
             </div>
+
             <div className="overflow-x-auto">
                 <table className="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
                     <thead className="bg-gray-100">
                         <tr>
-                            <th className="py-2 px-4 border-b">Currency</th>
-                            <th className="py-2 px-4 border-b">Rate</th>
-                            <th className="py-2 px-4 border-b">Change</th>
+                            <th className="py-2 px-4 border-b cursor-pointer">Currency</th>
+                            <th className="py-2 px-4 border-b cursor-pointer">Rate</th>
+                            <th className="py-2 px-4 border-b cursor-pointer">Change</th>
+                            <th className="py-2 px-4 border-b"></th>
                         </tr>
                     </thead>
                     <tbody>
-                        {currentItems.map((currency, index) => (
-                            <tr
-                                key={index}
-                                className={`cursor-pointer ${index % 2 === 0 ? 'bg-gray-50' : ''} ${hoveredRow === index ? 'bg-gray-200' : ''
-                                    } ${filterValue === 'rising' && parseFloat(currency.change) > 0
-                                        ? 'text-green-500'
-                                        : ''
-                                    } ${filterValue === 'falling' && parseFloat(currency.change) < 0
-                                        ? 'text-red-500'
-                                        : ''
-                                    }`}
-                                onMouseEnter={() => handleRowHover(index)}
-                                onMouseLeave={() => handleRowHover(null)}
-                            >
-                                <td className="py-2 px-4 border-b">{currency.currency}</td>
-                                <td className="py-2 px-4 border-b text-right">{currency.rate}</td>
-                                <td className={`py-2 px-4 border-b text-right`}>{currency.change}</td>
-                            </tr>
-                        ))}
+                        {rowsToRender}
                     </tbody>
                 </table>
             </div>
