@@ -9,6 +9,7 @@ const BIST = () => {
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
     const fetchData = async () => {
         try {
@@ -16,26 +17,26 @@ const BIST = () => {
             const options = {
                 method: 'GET',
                 headers: {
-                    // 'authorization': 'apikey 2KPeyEBBXoLABHUUSN92eh:1xS2pxDsaklaQZg5RQ40Hw',
                     'authorization': 'apikey 3HS07jD2MtstjfOkuxsw2A:6ZtSt2wk5HMIp5Bx5dAhAd', /* ermandilekbuse */
-
                     'content-type': 'application/json',
                 },
             };
 
             const response = await fetch(url, options);
             const result = await response.json();
-            console.log(result);
 
             const quotes = result.result;
-
-            // Coin'leri tracking list'e göre işle
             const updatedQuotes = quotes.map((quote) => ({
                 ...quote,
                 isTracked: state.trackingList.includes(quote.code),
             }));
 
+            // Calculate total pages based on itemsPerPage
+            const newTotalPages = Math.ceil(updatedQuotes.length / itemsPerPage);
+
+            // Update state with quotes and total pages
             setCoin({ quotes: updatedQuotes });
+            setTotalPages(newTotalPages);
         } catch (error) {
             console.error(error);
         }
@@ -46,14 +47,12 @@ const BIST = () => {
     }, []);
 
     useEffect(() => {
-        // Arama terimine göre filtreleme yap
         const filteredQuotes = coin.quotes.filter((quote) => {
             const matchesFilterLetter = !filterLetter || quote.code.toLowerCase().startsWith(filterLetter);
             const matchesSearchTerm = !searchTerm || quote.code.toLowerCase().includes(searchTerm.toLowerCase());
             return matchesFilterLetter && matchesSearchTerm;
         });
         if (!isEqual(filteredQuotes, coin.quotes)) {
-            // Filtrelenmiş hisseleri ayarla
             setCoin({ quotes: filteredQuotes });
         }
     }, [filterLetter, searchTerm, coin.quotes]);
@@ -78,14 +77,13 @@ const BIST = () => {
 
     const handleItemsPerPageChange = (e) => {
         setItemsPerPage(parseInt(e.target.value, 10));
-        setCurrentPage(1); // Reset current page when items per page changes
+        setCurrentPage(1);
     };
 
     return (
         <div className="container mx-auto mt-4 overflow-x-auto">
             <h2 className="text-2xl font-bold mb-4">Canlı Borsa</h2>
 
-            {/* Arama kutusu */}
             <div className="mb-4 flex items-center justify-center">
                 <input
                     type="text"
@@ -96,7 +94,6 @@ const BIST = () => {
                 />
             </div>
 
-            {/* Filter buttons */}
             <div className="flex flex-wrap mb-4">
                 {[...Array(26)].map((_, index) => (
                     <button
@@ -117,7 +114,6 @@ const BIST = () => {
                 ))}
             </div>
 
-            {/* Items per page radio buttons */}
             <div className="mb-4">
                 <label className="mr-4">Satır Sayısı:</label>
                 <label className="mr-4">
@@ -134,7 +130,6 @@ const BIST = () => {
                 </label>
             </div>
 
-            {/* Table */}
             <div className="overflow-x-auto">
                 <table className="min-w-full table-auto">
                     <thead>
@@ -149,45 +144,60 @@ const BIST = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {coin.quotes.map((quote, index) => (
-                            <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : ''}>
-                                <td className="p-2 text-center text-sm">
-                                    <button
-                                        className="p-1 bg-blue-500 text-white rounded hover:bg-blue-700"
-                                        onClick={() => addToTrackingList(quote)}
-                                    >
-                                        +
-                                    </button>
-                                </td>
-                                <td className="p-2 text-center text-sm">
-                                    {quote.rate < 0 ? (
-                                        <>
-                                            {quote.code || 'Unknown'}
-                                            <span className="text-red-500 ml-1">&#9660;</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            {quote.code || 'Unknown'}
-                                            <span className="text-green-500 ml-1">&#9650;</span>
-                                        </>
-                                    )}
-                                </td>
-                                <td className="p-2 text-right text-sm pr-10">{(quote.lastprice || 0).toFixed(2)}</td>
-                                <td className="p-2 text-right text-sm pr-10">{(quote.max || 0).toFixed(2)}</td>
-                                <td className="p-2 text-right text-sm pr-10">{(quote.min || 0).toFixed(2)}</td>
-                                <td className="p-2 text-right text-sm pr-10">{(quote.rate || 0).toFixed(2)}</td>
-                                <td className="p-2 text-center text-sm pr-10">
-                                    <button
-                                        className="p-1 bg-red-500 text-white rounded hover:bg-red-700"
-                                        onClick={() => removeFromTrackingList(quote)}
-                                    >
-                                        -
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
+                        {coin.quotes
+                            .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                            .map((quote, index) => (
+                                <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : ''}>
+                                    <td className="p-2 text-center text-sm">
+                                        <button
+                                            className="p-1 bg-blue-500 text-white rounded hover:bg-blue-700"
+                                            onClick={() => addToTrackingList(quote)}
+                                        >
+                                            +
+                                        </button>
+                                    </td>
+                                    <td className="p-2 text-center text-sm">
+                                        {quote.rate < 0 ? (
+                                            <>
+                                                {quote.code || 'Unknown'}
+                                                <span className="text-red-500 ml-1">&#9660;</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                {quote.code || 'Unknown'}
+                                                <span className="text-green-500 ml-1">&#9650;</span>
+                                            </>
+                                        )}
+                                    </td>
+                                    <td className="p-2 text-right text-sm pr-10">{(quote.lastprice || 0).toFixed(2)}</td>
+                                    <td className="p-2 text-right text-sm pr-10">{(quote.max || 0).toFixed(2)}</td>
+                                    <td className="p-2 text-right text-sm pr-10">{(quote.min || 0).toFixed(2)}</td>
+                                    <td className="p-2 text-right text-sm pr-10">{(quote.rate || 0).toFixed(2)}</td>
+                                    <td className="p-2 text-center text-sm pr-10">
+                                        <button
+                                            className="p-1 bg-red-500 text-white rounded hover:bg-red-700"
+                                            onClick={() => removeFromTrackingList(quote)}
+                                        >
+                                            -
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
                     </tbody>
                 </table>
+            </div>
+
+            <div className="flex justify-center mt-4">
+                {Array.from({ length: totalPages }, (_, index) => (
+                    <button
+                        key={index}
+                        className={`px-3 py-1 mx-1 border rounded-full ${currentPage === index + 1 ? 'bg-blue-500 text-white' : 'hover:bg-gray-200'
+                            }`}
+                        onClick={() => setCurrentPage(index + 1)}
+                    >
+                        {index + 1}
+                    </button>
+                ))}
             </div>
         </div>
     );

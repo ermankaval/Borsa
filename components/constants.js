@@ -3,8 +3,8 @@ import dayjs from 'dayjs';
 export const candleStickOptions = {
     options: {
         chart: {
-            width: 100,
-            height: 150,
+            width: 50,
+            height: 50,
             type: 'candlestick',
             background: '#00E396',
         },
@@ -15,7 +15,7 @@ export const candleStickOptions = {
         annotations: {
             xaxis: [
                 {
-                    x: 'Oct 06 14:00',
+                    // x: 'Oct 06 14:00',
                     borderColor: '#00E396',
                     label: {
                         borderColor: '#00E396',

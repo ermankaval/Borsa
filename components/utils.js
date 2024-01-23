@@ -2,9 +2,9 @@ export const formatStockData = (stockData) => {
 
     const formattedData = []
 
-    if (stockData['Weekly Adjusted Time Series']) {
+    if (stockData['Time Series FX (Daily)']) {
         Object.entries(
-            stockData['Weekly Adjusted Time Series']
+            stockData['Time Series FX (Daily)']
         ).map(
             ([key, value]) => {
                 formattedData.push({
