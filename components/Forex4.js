@@ -6,10 +6,11 @@ const Main = () => {
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [hoveredRow, setHoveredRow] = useState(null);
     const [filterOption, setFilterOption] = useState('all'); // 'all', 'rising', 'falling'
+    const [sortOrder, setSortOrder] = useState('desc'); // 'asc', 'desc'
 
     const fetchData = async () => {
         try {
-            const url = 'https://finans.truncgil.com/today.json';
+            const url = 'https://finans.truncgil.com/v4/today.json';
             const options = {
                 method: 'GET',
                 headers: {},
@@ -21,8 +22,8 @@ const Main = () => {
             if (result && result["Update_Date"]) {
                 const data = Object.keys(result).map(currencyKey => ({
                     currency: currencyKey,
-                    rate: result[currencyKey].Satış,
-                    change: result[currencyKey].Değişim,
+                    rate: result[currencyKey].Selling,
+                    change: result[currencyKey].Change,
                     loading: false,
                 }));
 
@@ -39,6 +40,11 @@ const Main = () => {
         fetchData();
     }, []);
 
+    const handlePlusClick = (currency) => {
+        // Burada artı butonuna tıklanınca yapılacak işlemleri ekleyebilirsiniz
+        console.log(`Artı butonuna tıklandı: ${currency.currency}`);
+    };
+
     const filteredData = currencyData.filter(currency => currency.currency.toLowerCase() !== 'update_date');
 
     const filteredAndSortedData = filteredData.filter(currency => {
@@ -51,10 +57,20 @@ const Main = () => {
         return true; // 'all' or unknown filter value
     });
 
+    const sortedData = filteredAndSortedData.sort((a, b) => {
+        const changeA = parseFloat(a.change);
+        const changeB = parseFloat(b.change);
+
+        if (sortOrder === 'asc') {
+            return changeA - changeB;
+        } else {
+            return changeB - changeA;
+        }
+    });
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredAndSortedData.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = sortedData.slice(indexOfFirstItem, indexOfLastItem);
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -73,7 +89,13 @@ const Main = () => {
         setCurrentPage(1);
     };
 
+    const handleSortChange = () => {
+        setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    };
+
     const rowsToRender = currentItems.map((currency, index) => {
+        const numericChange = parseFloat(currency.change);
+
         return (
             <tr
                 key={index}
@@ -85,13 +107,17 @@ const Main = () => {
                 onMouseEnter={() => handleRowHover(index)}
                 onMouseLeave={() => handleRowHover(null)}
             >
+                <td className="py-2 px-4 border-b text-center">
+                    {/* Artı butonu eklenmiş sütun */}
+                    <button onClick={() => handlePlusClick(currency)} className="text-blue-500">&#43;</button>
+                </td>
                 <td className="py-2 px-4 border-b text-center">{currency.currency}</td>
-                <td className="py-2 px-4 border-b text-center">{currency.rate}</td>
+                <td className="py-2 px-4 border-b text-center">{parseFloat(currency.rate).toFixed(2)}</td>
                 <td className={`py-2 px-4 border-b text-center`}>
-                    {currency.change}
+                    {`${numericChange.toFixed(2)}%`}
                 </td>
                 <td className="py-2 px-4 border-b text-center">
-                    {currency.change.includes('-') ? (
+                    {numericChange < 0 ? (
                         <span className="text-red-500">&#9660;</span> // Red triangle for negative change
                     ) : (
                         <span className="text-green-500">&#9650;</span> // Green triangle for non-negative change
@@ -100,7 +126,6 @@ const Main = () => {
             </tr>
         );
     });
-
 
     return (
         <div className="container mx-auto mt-4 h-screen w-full lg:w-1/2">
@@ -119,7 +144,7 @@ const Main = () => {
 
                 <span className="text-lg font-semibold">Filtrele: </span>
                 <select
-                    className="border p-2 rounded-md"
+                    className="border p-2 rounded-md mr-4"
                     value={filterOption}
                     onChange={handleFilterChange}
                 >
@@ -128,12 +153,19 @@ const Main = () => {
                     <option value="falling">Değeri Düşenler</option>
                 </select>
 
+                <button
+                    className="text-lg font-semibold p-2 rounded-md border"
+                    onClick={handleSortChange}
+                >
+                    Sırala: {sortOrder === 'asc' ? 'Artan' : 'Azalan'}
+                </button>
             </div>
 
             <div className="overflow-x-auto">
                 <table className="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
                     <thead className="bg-gray-100">
                         <tr>
+                            <th className="py-2 px-4 border-b"></th>
                             <th className="py-2 px-4 border-b cursor-pointer">Currency</th>
                             <th className="py-2 px-4 border-b cursor-pointer">Rate</th>
                             <th className="py-2 px-4 border-b cursor-pointer">Change</th>
