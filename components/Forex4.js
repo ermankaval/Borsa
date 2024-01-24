@@ -130,10 +130,35 @@ const Main = () => {
     return (
         <div className="container mx-auto mt-4 h-screen w-full lg:w-1/2">
             <h2 className="text-2xl font-bold mb-4">Currency Data</h2>
-            <div className="flex justify-between items-center mb-4">
+            <div className="overflow-x-auto">
+                <table className="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
+                    <thead className="bg-gray-100">
+                        <tr>
+                            <th className="py-2 px-4 border-b"></th>
+                            <th className="py-2 px-4 border-b cursor-pointer">Currency</th>
+                            <th className="py-2 px-4 border-b cursor-pointer">
+                                Rate
+
+                            </th>
+                            <th className="py-2 px-4 border-b cursor-pointer">Change</th>
+                            <th className="py-2 px-4 border-b">
+                                <button
+                                    className="text-lg font-semibold p-2 rounded-md border ml-2"
+                                    onClick={handleSortChange}
+                                >
+                                    {sortOrder === 'asc' ? '↑' : '↓'}
+                                </button></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {rowsToRender}
+                    </tbody>
+                </table>
+            </div>
+            <div className="flex justify-between items-center mt-4">
                 <span className="text-lg font-semibold">Sayfayı Görüntüle: </span>
                 <select
-                    className="border p-2 rounded-md mr-4"
+                    className="border p-2 rounded-md"
                     value={itemsPerPage}
                     onChange={handleItemsPerPageChange}
                 >
@@ -144,7 +169,7 @@ const Main = () => {
 
                 <span className="text-lg font-semibold">Filtrele: </span>
                 <select
-                    className="border p-2 rounded-md mr-4"
+                    className="border p-2 rounded-md"
                     value={filterOption}
                     onChange={handleFilterChange}
                 >
@@ -152,30 +177,6 @@ const Main = () => {
                     <option value="rising">Değeri Yükselenler</option>
                     <option value="falling">Değeri Düşenler</option>
                 </select>
-
-                <button
-                    className="text-lg font-semibold p-2 rounded-md border"
-                    onClick={handleSortChange}
-                >
-                    Sırala: {sortOrder === 'asc' ? 'Artan' : 'Azalan'}
-                </button>
-            </div>
-
-            <div className="overflow-x-auto">
-                <table className="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
-                    <thead className="bg-gray-100">
-                        <tr>
-                            <th className="py-2 px-4 border-b"></th>
-                            <th className="py-2 px-4 border-b cursor-pointer">Currency</th>
-                            <th className="py-2 px-4 border-b cursor-pointer">Rate</th>
-                            <th className="py-2 px-4 border-b cursor-pointer">Change</th>
-                            <th className="py-2 px-4 border-b"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {rowsToRender}
-                    </tbody>
-                </table>
             </div>
             <div className="flex justify-center mt-4">
                 {Array.from({ length: Math.ceil(filteredData.length / itemsPerPage) }, (_, index) => (
