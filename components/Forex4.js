@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useCurrencyContext } from './CurrencyContext';
 
-const Main = () => {
+const Forex4 = () => {
     const [currencyData, setCurrencyData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [hoveredRow, setHoveredRow] = useState(null);
     const [filterOption, setFilterOption] = useState('all'); // 'all', 'rising', 'falling'
     const [sortOrder, setSortOrder] = useState('desc'); // 'asc', 'desc'
+    // const [selectedCurrencies, setSelectedCurrencies] = useState([]);
+
+    const { state, dispatch } = useCurrencyContext();
+
+    const selectedCurrencies = state.selectedCurrencies
+
 
     const fetchData = async () => {
         try {
@@ -44,11 +50,23 @@ const Main = () => {
         fetchData();
     }, []);
 
-    const { addSelectedCurrency } = useCurrencyContext();
+    // const addSelectedCurrency = (currency) => {
+    //     setSelectedCurrencies((prevCurrencies) => [...prevCurrencies, { ...currency, isStarred: true }]);
+    // };
+
+
 
     const handlePlusClick = (currency) => {
-        addSelectedCurrency(currency);
-        console.log(`Artı butonuna tıklandı: ${currency.currency}`);
+        // Seçilen döviz birimini ekleyin
+        const updatedCurrencies = state.selectedCurrencies
+            ? [...state.selectedCurrencies, { ...currency, isStarred: true }]
+            : [{ ...currency, isStarred: true }];
+
+        // CurrencyContext dosyasındaki dispatch fonksiyonunu kullanarak güncel durumu iletiyoruz
+        dispatch({
+            type: 'ADD_SELECTED_CURRENCY',
+            payload: updatedCurrencies
+        });
 
         // Yıldız durumunu toggle et
         setCurrencyData((prevData) =>
@@ -111,14 +129,10 @@ const Main = () => {
 
         const rowStyles = {
             cursor: 'pointer',
-            backgroundColor: index % 2 === 0 ? 'var(--bg-light-gray)' : 'var(--bg-white)',
+            backgroundColor: index % 2 === 0 ? 'var(--bg-light-gray)' : 'var(--bg-black)',
+            ...(hoveredRow === index && { backgroundColor: 'var(--bg-gray-300)' }),
         };
-
-        // Apply hover effect
-        if (hoveredRow === index) {
-            rowStyles.backgroundColor = 'var(--bg-gray-300)';
-        }
-
+        console.log(rowStyles);
         return (
             <tr
                 key={index}
@@ -128,8 +142,8 @@ const Main = () => {
             >
                 <td className="py-0.5 px-4 border-b text-center text-sm">
                     <button
-                        className={`text-lg font-semibold ${currency.isStarred ? 'bg-green-500' : 'bg-blue-500'
-                            } p-2 rounded-md border ml-2`}
+                        className={`text - lg font - semibold ${currency.isStarred ? 'bg-green-500' : 'bg-blue-500'
+                            } p - 2 rounded - md border ml - 2`}
                         onClick={() => handlePlusClick(currency)}
                     >
                         {currency.isStarred ? '★' : '+'}
@@ -137,7 +151,7 @@ const Main = () => {
                 </td>
                 <td className="py-0.5 px-4 border-b text-center text-sm">{currency.currency}</td>
                 <td className="py-0.5 px-4 border-b text-center text-sm">{parseFloat(currency.rate).toFixed(2)}</td>
-                <td className={`py-1 px-4 border-b text-center`}>{`${numericChange.toFixed(2)}%`}</td>
+                <td className={`py - 1 px - 4 border-b text-center-sm`}>{`${numericChange.toFixed(2)} % `}</td>
                 <td className="py-0.5 px-4 border-b text-center text-sm">
                     {numericChange < 0 ? (
                         <span className="text-red-500">&#9660;</span>
@@ -200,7 +214,7 @@ const Main = () => {
                 {Array.from({ length: Math.ceil(sortedData.length / itemsPerPage) }, (_, index) => (
                     <button
                         key={index}
-                        className={`px-3 py-1 mx-1 border rounded-full ${currentPage === index + 1 ? 'bg-blue-500 text-white' : 'hover:bg-gray-200'
+                        className={`px - 3 py - 1 mx - 1 border rounded - full ${currentPage === index + 1 ? 'bg-blue-500 text-white' : 'hover:bg-gray-200'
                             }`}
                         onClick={() => paginate(index + 1)}
                     >
@@ -212,4 +226,4 @@ const Main = () => {
     );
 };
 
-export default Main;
+export default Forex4;

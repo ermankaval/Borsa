@@ -1,16 +1,13 @@
+// Navbar.js
+
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { BiSearch, BiMenu } from 'react-icons/bi';
 import Logo from './Logo';
-// import { useAppContext } from './context';
 import { useCurrencyContext } from './CurrencyContext';
-// import { Link } from 'react-router-dom';
 
 const Navbar = () => {
-
-    // const { state } = useAppContext();
-    const { state } = useCurrencyContext();
-
+    const { selectedCurrencies } = useCurrencyContext();
     const [scrolled, setScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -41,7 +38,7 @@ const Navbar = () => {
             window.removeEventListener('scroll', handleScroll);
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [scrolled]);
+    }, [scrolled, selectedCurrencies]); // selectedCurrencies'i bağımlılıklara ekledik
 
     return (
         <nav className={`flex items-center justify-between p-4 ${scrolled ? 'bg-black' : ''} bg-black fixed w-full top-0 z-50`}>
@@ -63,7 +60,9 @@ const Navbar = () => {
                     </li>
                     <li className='headerLink'>
                         <Link href="/TrackingListPage">
-                            <span className={`text-white ${scrolled ? 'hover:text-gray-300' : 'hover:text-gray-800'}`}>Takip Listem</span>
+                            <span className={`text-white ${scrolled ? 'hover:text-gray-300' : 'hover:text-gray-800'}`}>
+                                Takip Listem {selectedCurrencies ? selectedCurrencies.length : 0}
+                            </span>
                         </Link>
                     </li>
                 </ul>
@@ -80,8 +79,7 @@ const Navbar = () => {
             <div
                 ref={closeMobileMenuOutsideClick}
                 className={`md:hidden ${isMobileMenuOpen ? 'block' : 'hidden'} fixed top-0 right-0 w-full h-full bg-black bg-opacity-70 overflow-y-auto`}
-                style={{ maxWidth: '200px', margin: '0 auto', padding: '20px' }} // Adjust the max-width and padding as needed
-
+                style={{ maxWidth: '200px', margin: '0 auto', padding: '20px' }}
             >
                 <ul className="flex flex-col space-y-3">
                     <li onClick={() => { handleMobileMenuToggle(); }}>
@@ -98,7 +96,7 @@ const Navbar = () => {
                     <li onClick={() => { handleMobileMenuToggle(); }}>
                         <Link href="/TrackingListPage">
                             <span className={`text-white ${scrolled ? 'hover:text-gray-300' : 'hover:text-gray-800'}`}>
-                                Takip Listem
+                                Takip Listem {selectedCurrencies ? selectedCurrencies.length : 0}
                             </span>
                         </Link>
                     </li>

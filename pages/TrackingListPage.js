@@ -1,31 +1,49 @@
-// TrackingListPage.js
 import React from 'react';
-import { useAppContext } from '../components/context';
+import { useCurrencyContext } from '../components/CurrencyContext';
 import Navbar from '@/components/Navbar';
 
 const TrackingListPage = () => {
-    const { state } = useAppContext();
+    const { state } = useCurrencyContext();
+    const selectedCurrencies = state.selectedCurrencies;
+
+    if (!selectedCurrencies || selectedCurrencies.length === 0) {
+        return (
+            <div>
+                <Navbar />
+                <div className="container mx-auto mt-4">
+                    <h2 className="text-2xl font-bold mb-4">Tracking List</h2>
+                    <p>No currencies selected. Please add currencies from the main page.</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div>
             <Navbar />
-            <h2 className="text-2xl font-bold mb-4">Takip Listem</h2>
-            <table className="min-w-full border">
-                <thead>
-                    <tr>
-                        <th className="border p-2 text-center">Code</th>
-                        <th className="border p-2 text-center">Last Price</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {state.trackingList.map((quote) => (
-                        <tr key={quote.code} className="bg-gray-50">
-                            <td className="border p-2 text-center">{quote.code}</td>
-                            <td className="border p-2 text-center">{quote.lastprice}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            <div className="flex flex-col items-center container mx-auto mt-4 h-screen w-full lg:w-1/2 overflow-y-auto">
+                <h2 className="text-2xl font-bold mb-4">Tracking List</h2>
+                <div className="max-h-96 overflow-auto mb-4"> {/* Added margin-bottom */}
+                    <table className="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
+                        <thead className="bg-gray-100">
+                            <tr>
+                                <th className="py-2 px-4 border-b cursor-pointer">Currency</th>
+                                <th className="py-2 px-4 border-b cursor-pointer">Rate</th>
+                                <th className="py-2 px-4 border-b cursor-pointer">Change</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {selectedCurrencies.map((currency, index) => (
+                                <tr key={index}>
+                                    <td className="py-2 px-4 border-b">{currency.currency}</td>
+                                    <td className="py-2 px-4 border-b">{parseFloat(currency.rate).toFixed(2)}</td>
+                                    <td className="py-2 px-4 border-b">{parseFloat(currency.change).toFixed(2)}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     );
 };
