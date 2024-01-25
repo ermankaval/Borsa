@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useCurrencyContext } from './CurrencyContext';
 
 const Main = () => {
     const [currencyData, setCurrencyData] = useState([]);
@@ -19,17 +20,20 @@ const Main = () => {
             const response = await fetch(url, options);
             const result = await response.json();
 
-            if (result && result["Update_Date"]) {
-                const data = Object.keys(result).map(currencyKey => ({
-                    currency: currencyKey,
-                    rate: result[currencyKey].Selling,
-                    change: result[currencyKey].Change,
-                    loading: false,
-                }));
+            if (result && result['Update_Date']) {
+                const data = Object.keys(result)
+                    .filter((currencyKey) => currencyKey.toLowerCase() !== 'update_date')
+                    .map((currencyKey) => ({
+                        currency: currencyKey,
+                        rate: result[currencyKey].Selling,
+                        change: result[currencyKey].Change,
+                        loading: false,
+                        isStarred: false,
+                    }));
 
                 setCurrencyData(data);
             } else {
-                console.error("Invalid response format or missing data");
+                console.error('Invalid response format or missing data');
             }
         } catch (error) {
             console.error(error);
@@ -40,14 +44,23 @@ const Main = () => {
         fetchData();
     }, []);
 
+    const { addSelectedCurrency } = useCurrencyContext();
+
     const handlePlusClick = (currency) => {
-        // Burada artı butonuna tıklanınca yapılacak işlemleri ekleyebilirsiniz
+        addSelectedCurrency(currency);
         console.log(`Artı butonuna tıklandı: ${currency.currency}`);
+
+        // Yıldız durumunu toggle et
+        setCurrencyData((prevData) =>
+            prevData.map((item) =>
+                item.currency === currency.currency ? { ...item, isStarred: !item.isStarred } : item
+            )
+        );
     };
 
-    const filteredData = currencyData.filter(currency => currency.currency.toLowerCase() !== 'update_date');
+    const filteredData = currencyData.filter((currency) => currency.currency.toLowerCase() !== 'update_date');
 
-    const filteredAndSortedData = filteredData.filter(currency => {
+    const filteredAndSortedData = filteredData.filter((currency) => {
         const changeValue = currency.change;
         if (filterOption === 'rising') {
             return !changeValue.includes('-');
@@ -96,31 +109,40 @@ const Main = () => {
     const rowsToRender = currentItems.map((currency, index) => {
         const numericChange = parseFloat(currency.change);
 
+        const rowStyles = {
+            cursor: 'pointer',
+            backgroundColor: index % 2 === 0 ? 'var(--bg-light-gray)' : 'var(--bg-white)',
+        };
+
+        // Apply hover effect
+        if (hoveredRow === index) {
+            rowStyles.backgroundColor = 'var(--bg-gray-300)';
+        }
+
         return (
             <tr
                 key={index}
-                className={`
-                cursor-pointer
-                ${index % 2 === 0 ? 'bg-gray-50' : ''}
-                ${hoveredRow === index ? 'bg-gray-200' : ''}
-            `}
+                style={rowStyles}
                 onMouseEnter={() => handleRowHover(index)}
                 onMouseLeave={() => handleRowHover(null)}
             >
-                <td className="py-2 px-4 border-b text-center">
-                    {/* Artı butonu eklenmiş sütun */}
-                    <button onClick={() => handlePlusClick(currency)} className="text-blue-500">&#43;</button>
+                <td className="py-0.5 px-4 border-b text-center text-sm">
+                    <button
+                        className={`text-lg font-semibold ${currency.isStarred ? 'bg-green-500' : 'bg-blue-500'
+                            } p-2 rounded-md border ml-2`}
+                        onClick={() => handlePlusClick(currency)}
+                    >
+                        {currency.isStarred ? '★' : '+'}
+                    </button>
                 </td>
-                <td className="py-2 px-4 border-b text-center">{currency.currency}</td>
-                <td className="py-2 px-4 border-b text-center">{parseFloat(currency.rate).toFixed(2)}</td>
-                <td className={`py-2 px-4 border-b text-center`}>
-                    {`${numericChange.toFixed(2)}%`}
-                </td>
-                <td className="py-2 px-4 border-b text-center">
+                <td className="py-0.5 px-4 border-b text-center text-sm">{currency.currency}</td>
+                <td className="py-0.5 px-4 border-b text-center text-sm">{parseFloat(currency.rate).toFixed(2)}</td>
+                <td className={`py-1 px-4 border-b text-center`}>{`${numericChange.toFixed(2)}%`}</td>
+                <td className="py-0.5 px-4 border-b text-center text-sm">
                     {numericChange < 0 ? (
-                        <span className="text-red-500">&#9660;</span> // Red triangle for negative change
+                        <span className="text-red-500">&#9660;</span>
                     ) : (
-                        <span className="text-green-500">&#9650;</span> // Green triangle for non-negative change
+                        <span className="text-green-500">&#9650;</span>
                     )}
                 </td>
             </tr>
@@ -131,15 +153,35 @@ const Main = () => {
         <div className="container mx-auto mt-4 h-screen w-full lg:w-1/2">
             <h2 className="text-2xl font-bold mb-4">Currency Data</h2>
             <div className="overflow-x-auto">
+                <div className="flex justify-between items-center mt-4">
+                    <span className="text-lg font-semibold">Sayfayı Görüntüle: </span>
+                    <select
+                        className="border p-0.5 rounded-md"
+                        value={itemsPerPage}
+                        onChange={handleItemsPerPageChange}
+                    >
+                        <option value={10}>10</option>
+                        <option value={20}>20</option>
+                        <option value={30}>30</option>
+                    </select>
+                    <span className="text-lg font-semibold">Filtrele: </span>
+                    <select
+                        className="border p-0.5 rounded-md"
+                        value={filterOption}
+                        onChange={handleFilterChange}
+                    >
+                        <option value="all">Hepsi</option>
+                        <option value="rising">Değeri Yükselenler</option>
+                        <option value="falling">Değeri Düşenler</option>
+                    </select>
+                </div>
+                <div className="mb-4"></div>
                 <table className="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
                     <thead className="bg-gray-100">
                         <tr>
                             <th className="py-2 px-4 border-b"></th>
                             <th className="py-2 px-4 border-b cursor-pointer">Currency</th>
-                            <th className="py-2 px-4 border-b cursor-pointer">
-                                Rate
-
-                            </th>
+                            <th className="py-2 px-4 border-b cursor-pointer">Rate</th>
                             <th className="py-2 px-4 border-b cursor-pointer">Change</th>
                             <th className="py-2 px-4 border-b">
                                 <button
@@ -147,39 +189,15 @@ const Main = () => {
                                     onClick={handleSortChange}
                                 >
                                     {sortOrder === 'asc' ? '↑' : '↓'}
-                                </button></th>
+                                </button>
+                            </th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {rowsToRender}
-                    </tbody>
+                    <tbody>{rowsToRender}</tbody>
                 </table>
             </div>
-            <div className="flex justify-between items-center mt-4">
-                <span className="text-lg font-semibold">Sayfayı Görüntüle: </span>
-                <select
-                    className="border p-2 rounded-md"
-                    value={itemsPerPage}
-                    onChange={handleItemsPerPageChange}
-                >
-                    <option value={10}>10</option>
-                    <option value={20}>20</option>
-                    <option value={30}>30</option>
-                </select>
-
-                <span className="text-lg font-semibold">Filtrele: </span>
-                <select
-                    className="border p-2 rounded-md"
-                    value={filterOption}
-                    onChange={handleFilterChange}
-                >
-                    <option value="all">Hepsi</option>
-                    <option value="rising">Değeri Yükselenler</option>
-                    <option value="falling">Değeri Düşenler</option>
-                </select>
-            </div>
             <div className="flex justify-center mt-4">
-                {Array.from({ length: Math.ceil(filteredData.length / itemsPerPage) }, (_, index) => (
+                {Array.from({ length: Math.ceil(sortedData.length / itemsPerPage) }, (_, index) => (
                     <button
                         key={index}
                         className={`px-3 py-1 mx-1 border rounded-full ${currentPage === index + 1 ? 'bg-blue-500 text-white' : 'hover:bg-gray-200'

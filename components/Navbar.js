@@ -2,10 +2,15 @@ import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { BiSearch, BiMenu } from 'react-icons/bi';
 import Logo from './Logo';
-import { useAppContext } from './context';
+// import { useAppContext } from './context';
+import { useCurrencyContext } from './CurrencyContext';
+// import { Link } from 'react-router-dom';
 
 const Navbar = () => {
-    const { state } = useAppContext();
+
+    // const { state } = useAppContext();
+    const { state } = useCurrencyContext();
+
     const [scrolled, setScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -58,7 +63,7 @@ const Navbar = () => {
                     </li>
                     <li className='headerLink'>
                         <Link href="/TrackingListPage">
-                            <span className={`text-white ${scrolled ? 'hover:text-gray-300' : 'hover:text-gray-800'}`}>Takip Listem ({state.trackedCount})</span>
+                            <span className={`text-white ${scrolled ? 'hover:text-gray-300' : 'hover:text-gray-800'}`}>Takip Listem</span>
                         </Link>
                     </li>
                 </ul>
@@ -75,8 +80,10 @@ const Navbar = () => {
             <div
                 ref={closeMobileMenuOutsideClick}
                 className={`md:hidden ${isMobileMenuOpen ? 'block' : 'hidden'} fixed top-0 right-0 w-full h-full bg-black bg-opacity-70 overflow-y-auto`}
+                style={{ maxWidth: '200px', margin: '0 auto', padding: '20px' }} // Adjust the max-width and padding as needed
+
             >
-                <ul className="flex flex-col space-y-4 p-4">
+                <ul className="flex flex-col space-y-3">
                     <li onClick={() => { handleMobileMenuToggle(); }}>
                         <Link href="/hakkında">
                             <span className={`text-white ${scrolled ? 'hover:text-gray-300' : 'hover:text-gray-800'}`}>Hakkında</span>
@@ -91,7 +98,7 @@ const Navbar = () => {
                     <li onClick={() => { handleMobileMenuToggle(); }}>
                         <Link href="/TrackingListPage">
                             <span className={`text-white ${scrolled ? 'hover:text-gray-300' : 'hover:text-gray-800'}`}>
-                                Takip Listem ({state.trackedCount})
+                                Takip Listem
                             </span>
                         </Link>
                     </li>
@@ -99,6 +106,6 @@ const Navbar = () => {
             </div>
         </nav>
     );
-}
+};
 
 export default Navbar;
