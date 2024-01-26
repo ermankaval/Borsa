@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useCurrencyContext } from './CurrencyContext';
 
-
-
 const Forex4 = () => {
     const [currencyData, setCurrencyData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -12,9 +10,7 @@ const Forex4 = () => {
     const [sortOrder, setSortOrder] = useState('desc'); // 'asc', 'desc'
 
     const { state, dispatch } = useCurrencyContext();
-    const selectedCurrencies = state.selectedCurrencies
-
-
+    const selectedCurrencies = state.selectedCurrencies;
 
     const fetchData = async () => {
         try {
@@ -65,15 +61,12 @@ const Forex4 = () => {
                 payload: { ...currency, isStarred: true },
             });
         }
-        console.log('seçilen:', { selectedCurrencies })
         setCurrencyData((prevData) =>
             prevData.map((item) =>
                 item.currency === currency.currency ? { ...item, isStarred: !item.isStarred } : item
             )
         );
     };
-
-
 
     const filteredData = currencyData.filter((currency) => currency.currency.toLowerCase() !== 'update_date');
 
@@ -143,8 +136,8 @@ const Forex4 = () => {
                     <div className="flex items-center justify-center">
                         <button
                             className={`text-lg font-semibold ${currency.isStarred ? 'bg-green-500' : 'bg-blue-500'
-                                } p-2 rounded-md border ml-2`}
-                            style={{ width: '30px' }} // Set a fixed width
+                                } p-2 rounded-md border button-without-border`}
+                            style={{ width: '30px', height: '30px', lineHeight: '1' }}
                             onClick={() => handlePlusClick(currency)}
                         >
                             {currency.isStarred ? '★' : '+'}
@@ -153,7 +146,7 @@ const Forex4 = () => {
                 </td>
                 <td className="py-0.5 px-4 border-b text-center text-sm">{currency.currency}</td>
                 <td className="py-0.5 px-4 border-b text-center text-sm">{parseFloat(currency.rate).toFixed(2)}</td>
-                <td className={`py-1 px-4 border-b text-center-sm`}>{`${numericChange.toFixed(2)} % `}</td>
+                <td className={`py-1 px-4 border-b text-center text-sm`}>{`${numericChange.toFixed(2)} % `}</td>
                 <td className="py-0.5 px-4 border-b text-center text-sm">
                     {numericChange < 0 ? (
                         <span className="text-red-500">&#9660;</span>
@@ -167,36 +160,37 @@ const Forex4 = () => {
 
     return (
         <div className="container mx-auto mt-4 h-screen w-full lg:w-1/2">
-            <h2 className="text-2xl font-bold mb-4">Currency Data</h2>
             <div className="overflow-x-auto">
                 <div className="flex justify-between items-center mt-4">
-                    <span className="text-lg font-semibold">Sayfayı Görüntüle: </span>
+                    <span className="text-base font-semibold">Sayfa sayısı: </span>
                     <select
                         className="border p-0.5 rounded-md"
                         value={itemsPerPage}
                         onChange={handleItemsPerPageChange}
+                        style={{ maxWidth: '70px', marginRight: '10px' }}
                     >
                         <option value={10}>10</option>
                         <option value={20}>20</option>
                         <option value={30}>30</option>
                     </select>
-                    <span className="text-lg font-semibold">Filtrele: </span>
+                    <span className="text-base font-semibold">Filtrele: </span>
                     <select
                         className="border p-0.5 rounded-md"
                         value={filterOption}
                         onChange={handleFilterChange}
+                        style={{ maxWidth: '150px', marginRight: '10px' }}
                     >
                         <option value="all">Hepsi</option>
-                        <option value="rising">Değeri Yükselenler</option>
-                        <option value="falling">Değeri Düşenler</option>
+                        <option value="rising">Yükselenler</option>
+                        <option value="falling">Düşenler</option>
                     </select>
                 </div>
                 <div className="mb-4"></div>
                 <table className="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
                     <thead className="bg-gray-100">
                         <tr>
-                            <th className="py-2 px-4 border-b"></th>
-                            <th className="py-2 px-4 border-b cursor-pointer">Currency</th>
+                            <th className="py-2 px-4 border-b" style={{ width: '50px' }}></th>
+                            <th className="py-2 px-4 border-b cursor-pointer" style={{ width: '80px' }}>Currency</th>
                             <th className="py-2 px-4 border-b cursor-pointer">Rate</th>
                             <th className="py-2 px-4 border-b cursor-pointer">Change</th>
                             <th className="py-2 px-4 border-b">

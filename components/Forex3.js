@@ -10,7 +10,9 @@ const Main = () => {
     const [eurTry, setEurTry] = useState({ rate: '', change: '', loading: true });
     const [gbpTry, setGbpTry] = useState({ rate: '', change: '', loading: true });
     const [goldTry, setGoldTry] = useState({ rate: '', change: '', loading: true });
+    const [selectedCurrency, setSelectedCurrency] = useState(null);
     const [isChartVisible, setIsChartVisible] = useState(false);
+
 
     const fetchData = async (currency, setState) => {
         try {
@@ -47,17 +49,61 @@ const Main = () => {
         fetchData('GRA', setGoldTry);
     }, []);
 
-    const handleChartToggle = () => {
-        setIsChartVisible(!isChartVisible);
+    const handleChartToggle = (currencyKey) => {
+        // Toggle visibility only if the same currency is clicked
+        setIsChartVisible((prevIsChartVisible) =>
+            selectedCurrency === currencyKey ? !prevIsChartVisible : true
+        );
+
+        setSelectedCurrency((prevSelectedCurrency) =>
+            selectedCurrency === currencyKey ? null : currencyKey
+        );
     };
 
+    // useEffect(() => {
+    //     console.log('Selected Currency:', selectedCurrency);
+    // }, [selectedCurrency]);
+
     return (
-        <div className="flex justify-between mt-32 ml-auto mr-auto max-w-screen-lg">
-            <CurrencyCard currency="DOLAR" rate={usdTry.rate} change={usdTry.change} loading={usdTry.loading} flag={usFlag} onChartToggle={handleChartToggle} />
-            {isChartVisible && <LineChart />} {/* Render LineChart if isChartVisible is true */}
-            <CurrencyCard currency="EURO" rate={eurTry.rate} change={eurTry.change} loading={eurTry.loading} flag={euroFlag} />
-            <CurrencyCard currency="STERLIN" rate={gbpTry.rate} change={gbpTry.change} loading={gbpTry.loading} flag={gbpFlag} />
-            <CurrencyCard currency="GRAM ALTIN" rate={goldTry.rate} change={goldTry.change} loading={goldTry.loading} flag={goldFlag} />
+        <div className="flex flex-col mt-32 ml-auto mr-auto max-w-screen-lg">
+            <div className="flex justify-between">
+                <CurrencyCard
+                    currency="DOLAR"
+                    rate={usdTry.rate}
+                    change={usdTry.change}
+                    loading={usdTry.loading}
+                    onChartToggle={() => handleChartToggle('USD')}
+                />
+                <CurrencyCard
+                    currency="EURO"
+                    rate={eurTry.rate}
+                    change={eurTry.change}
+                    loading={eurTry.loading}
+                    onChartToggle={() => handleChartToggle('EUR')}
+                />
+                <CurrencyCard
+                    currency="STERLIN"
+                    rate={gbpTry.rate}
+                    change={gbpTry.change}
+                    loading={gbpTry.loading}
+                    onChartToggle={() => handleChartToggle('GBP')}
+                />
+                <CurrencyCard
+                    currency="GRAM ALTIN"
+                    rate={goldTry.rate}
+                    change={goldTry.change}
+                    loading={goldTry.loading}
+                    onChartToggle={() => handleChartToggle('GLD')}
+                />
+            </div>
+            {isChartVisible && selectedCurrency && (
+                <div>
+                    {selectedCurrency === 'USD' && <LineChart currencyKey="USD" rate={usdTry.rate} change={usdTry.change} />}
+                    {selectedCurrency === 'EUR' && <LineChart currencyKey="EUR" rate={eurTry.rate} change={eurTry.change} />}
+                    {selectedCurrency === 'GBP' && <LineChart currencyKey="GBP" rate={gbpTry.rate} change={gbpTry.change} />}
+                    {selectedCurrency === 'GLD' && <LineChart currencyKey="GLD" rate={goldTry.rate} change={goldTry.change} />}
+                </div>
+            )}
         </div>
     );
 };
@@ -73,11 +119,11 @@ const CurrencyCard = ({ currency, rate, change, loading, flag, onChartToggle }) 
     return (
         <div
             className="mx-auto z-20 flex-shrink-0 w-[calc(25%-16px)] p-2 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 text-center flex flex-col justify-between items-center"
-            onClick={onChartToggle} // Move the onClick event to the outer div
-            style={{ cursor: 'pointer' }} // Add cursor style to indicate it's clickable
+            onClick={onChartToggle}
+            style={{ cursor: 'pointer' }}
         >
             <div>
-                <img src={flag.src} alt={`${currency} Flag`} className="w-10 m-2 rounded-full mx-auto my-auto" />
+                {/* <img src={flag.src} alt={`${currency} Flag`} className="w-10 m-2 rounded-full mx-auto my-auto" /> */}
                 <h5 className="mb-2 text-sm font-bold tracking-tight text-gray-900 dark:text-white">{currency}</h5>
                 <h5 className="mb-2 text-sm font-bold tracking-tight text-gray-800 dark:text-white">
                     {formattedRate}

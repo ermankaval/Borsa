@@ -7,7 +7,7 @@ import Forex4 from '@/components/Forex4'
 import React from 'react';
 import Link from 'next/link';
 
-import LineChart from '@/components/LineChart';
+
 
 
 export default function Home() {
@@ -26,7 +26,6 @@ export default function Home() {
       `}</style>
 
       <Navbar />
-      {/* <LineChart /> */}
       <Forex3 />
       <Forex4 />
 
