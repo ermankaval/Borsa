@@ -5,8 +5,10 @@ import Navbar from '@/components/Navbar'
 import Forex3 from '@/components/Forex3'
 import Forex4 from '@/components/Forex4'
 import React from 'react';
-import Link from 'next/link'; // Import Link from Next.js
-import SelectedCurrenciesPage from './SelectedCurrenciesPage';
+import Link from 'next/link';
+
+import LineChart from '@/components/LineChart';
+
 
 export default function Home() {
   return (
@@ -24,9 +26,10 @@ export default function Home() {
       `}</style>
 
       <Navbar />
+      {/* <LineChart /> */}
       <Forex3 />
       <Forex4 />
-      <SelectedCurrenciesPage />
+
     </CurrencyProvider>
   )
 }
