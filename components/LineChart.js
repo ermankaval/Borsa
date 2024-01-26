@@ -14,20 +14,19 @@ const LineChart = ({ currencyKey, rate, change }) => {
                 borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 2,
                 pointRadius: 1,
+
             },
         ],
     });
 
     useEffect(() => {
-
         const fetchData = async () => {
             try {
-
                 const today = new Date();
                 const formattedToday = today.toISOString().slice(0, 10).replace(/[-]/g, '') + '235900';
 
                 const startDate = new Date();
-                startDate.setDate(today.getDate() - 90); // Bugünden 90 gün önce
+                startDate.setDate(today.getDate() - 90);
                 const formattedStartDate = startDate.toISOString().slice(0, 10).replace(/[-]/g, '') + '000000';
 
                 const url = `https://web-paragaranti-pubsub.foreks.com/web-services/historical-data?userName=undefined&name=S${currencyKey}&exchange=FREE&market=N&group=F&last=300&period=1440&intraPeriod=null&isLast=false&from=${formattedStartDate}&to=${formattedToday}`;
@@ -48,16 +47,25 @@ const LineChart = ({ currencyKey, rate, change }) => {
                     const labels = data.dataSet.map((item) => new Date(item.date).toLocaleDateString());
                     const closePrices = data.dataSet.map((item) => item.close);
 
+                    const lineColors = {
+                        'EUR': 'blue',
+                        'GBP': 'purple',
+                        'GLD': 'brown',
+                    };
+
+                    const lineColor = lineColors[currencyKey] || 'rgba(75, 192, 192, 1)';
+
                     setChartData({
                         labels: labels,
                         datasets: [
                             {
                                 label: `${currencyKey} (90 gün)`,
                                 data: closePrices,
-                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                borderColor: 'rgba(75, 192, 192, 1)',
+                                backgroundColor: `rgba(75, 192, 192, 0.2)`,
+                                borderColor: lineColor,
                                 borderWidth: 2,
-                                pointRadius: 4,
+                                pointRadius: 1,
+                                pointStyle: false,
                             },
                         ],
                     });
@@ -83,8 +91,11 @@ const LineChart = ({ currencyKey, rate, change }) => {
             type: 'line',
             data: chartData,
             options: {
+
                 plugins: {
                     tooltip: {
+                        mode: 'nearest',
+                        intersect: false,
                         callbacks: {
                             label: function (context) {
                                 const label = context.dataset.label || '';
@@ -95,6 +106,9 @@ const LineChart = ({ currencyKey, rate, change }) => {
                             },
                         },
                     },
+                    // legend: {
+                    //     display: false,
+                    // },
                 },
             },
         });
@@ -106,7 +120,7 @@ const LineChart = ({ currencyKey, rate, change }) => {
 
     return (
         <div>
-            <canvas id={`lineChart-${currencyKey}`} width="300" height="200"></canvas>
+            <canvas id={`lineChart-${currencyKey}`} width="300" height="150"></canvas>
         </div>
     );
 };
