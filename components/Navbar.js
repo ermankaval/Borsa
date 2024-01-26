@@ -4,10 +4,12 @@ import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { BiSearch, BiMenu } from 'react-icons/bi';
 import Logo from './Logo';
-import { useCurrencyContext } from './CurrencyContext';
+import CurrencyProvider, { useCurrencyContext } from './CurrencyContext';
+
 
 const Navbar = () => {
-    const { selectedCurrencies } = useCurrencyContext();
+    const { state } = useCurrencyContext();
+    const { selectedCurrencies } = state;
     const [scrolled, setScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -33,76 +35,79 @@ const Navbar = () => {
     useEffect(() => {
         window.addEventListener('scroll', handleScroll);
         document.addEventListener('mousedown', handleClickOutside);
+        // console.log('Navbar - Selected Currencies:', selectedCurrencies);
 
         return () => {
             window.removeEventListener('scroll', handleScroll);
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [scrolled, selectedCurrencies]); // selectedCurrencies'i bağımlılıklara ekledik
+    }, [scrolled, selectedCurrencies]);
 
     return (
-        <nav className={`flex items-center justify-between p-4 ${scrolled ? 'bg-black' : ''} bg-black fixed w-full top-0 z-50`}>
-            <div className='container flex justify-between items-center'>
-                <Link href="/">
-                    <Logo style={`h-12 w-[80px] ${scrolled ? 'text-white' : 'text-black'}`} />
-                </Link>
-                <ul className='hidden space-x-4 md:flex'>
-                    <li className='headerLink'>
-                        <Link href="/hakkında">
-                            <span className={`text-white ${scrolled ? 'hover:text-gray-300' : 'hover:text-gray-800'}`}>Hakkında</span>
-                        </Link>
-                    </li>
+        <CurrencyProvider>
+            <nav className={`flex items-center justify-between p-4 ${scrolled ? 'bg-black' : ''} bg-black fixed w-full top-0 z-50`}>
+                <div className='container flex justify-between items-center'>
+                    <Link href="/">
+                        <Logo style={`h-12 w-[80px] ${scrolled ? 'text-white' : 'text-black'}`} />
+                    </Link>
+                    <ul className='hidden space-x-4 md:flex'>
+                        <li className='headerLink'>
+                            <Link href="/hakkında">
+                                <span className={`text-white ${scrolled ? 'hover:text-gray-300' : 'hover:text-gray-800'}`}>Hakkında</span>
+                            </Link>
+                        </li>
 
-                    <li className='headerLink'>
-                        <Link href="/trendingNow">
-                            <span className={`text-white ${scrolled ? 'hover:text-gray-300' : 'hover:text-gray-800'}`}>İletişim</span>
-                        </Link>
-                    </li>
-                    <li className='headerLink'>
-                        <Link href="/TrackingListPage">
-                            <span className={`text-white ${scrolled ? 'hover:text-gray-300' : 'hover:text-gray-800'}`}>
-                                Takip Listem {selectedCurrencies ? selectedCurrencies.length : 0}
-                            </span>
-                        </Link>
-                    </li>
-                </ul>
-                <div className="md:hidden" style={{ marginRight: '20px' }}>
-                    <button
-                        className="text-white focus:outline-none"
-                        onClick={handleMobileMenuToggle}
-                    >
-                        <BiMenu className="h-6 w-6 cursor-pointer" />
-                    </button>
+                        <li className='headerLink'>
+                            <Link href="/trendingNow">
+                                <span className={`text-white ${scrolled ? 'hover:text-gray-300' : 'hover:text-gray-800'}`}>İletişim</span>
+                            </Link>
+                        </li>
+                        <li className='headerLink'>
+                            <Link href="/SelectedCurrenciesPage">
+                                <span className={`text-white ${scrolled ? 'hover:text-gray-300' : 'hover:text-gray-800'}`}>
+                                    Takip Listem ({selectedCurrencies ? selectedCurrencies.length : 0})
+                                </span>
+                            </Link>
+                        </li>
+                    </ul>
+                    <div className="md:hidden" style={{ marginRight: '20px' }}>
+                        <button
+                            className="text-white focus:outline-none"
+                            onClick={handleMobileMenuToggle}
+                        >
+                            <BiMenu className="h-6 w-6 cursor-pointer" />
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <div
-                ref={closeMobileMenuOutsideClick}
-                className={`md:hidden ${isMobileMenuOpen ? 'block' : 'hidden'} fixed top-0 right-0 w-full h-full bg-black bg-opacity-70 overflow-y-auto`}
-                style={{ maxWidth: '200px', margin: '0 auto', padding: '20px' }}
-            >
-                <ul className="flex flex-col space-y-3">
-                    <li onClick={() => { handleMobileMenuToggle(); }}>
-                        <Link href="/hakkında">
-                            <span className={`text-white ${scrolled ? 'hover:text-gray-300' : 'hover:text-gray-800'}`}>Hakkında</span>
-                        </Link>
-                    </li>
+                <div
+                    ref={closeMobileMenuOutsideClick}
+                    className={`md:hidden ${isMobileMenuOpen ? 'block' : 'hidden'} fixed top-0 right-0 w-full h-full bg-black bg-opacity-70 overflow-y-auto`}
+                    style={{ maxWidth: '200px', margin: '0 auto', padding: '20px' }}
+                >
+                    <ul className="flex flex-col space-y-3">
+                        <li onClick={() => { handleMobileMenuToggle(); }}>
+                            <Link href="/hakkında">
+                                <span className={`text-white ${scrolled ? 'hover:text-gray-300' : 'hover:text-gray-800'}`}>Hakkında</span>
+                            </Link>
+                        </li>
 
-                    <li onClick={() => { handleMobileMenuToggle(); }}>
-                        <Link href="/trendingNow">
-                            <span className={`text-white ${scrolled ? 'hover:text-gray-300' : 'hover:text-gray-800'}`}>İletişim</span>
-                        </Link>
-                    </li>
-                    <li onClick={() => { handleMobileMenuToggle(); }}>
-                        <Link href="/TrackingListPage">
-                            <span className={`text-white ${scrolled ? 'hover:text-gray-300' : 'hover:text-gray-800'}`}>
-                                Takip Listem {selectedCurrencies ? selectedCurrencies.length : 0}
-                            </span>
-                        </Link>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+                        <li onClick={() => { handleMobileMenuToggle(); }}>
+                            <Link href="/trendingNow">
+                                <span className={`text-white ${scrolled ? 'hover:text-gray-300' : 'hover:text-gray-800'}`}>İletişim</span>
+                            </Link>
+                        </li>
+                        <li onClick={() => { handleMobileMenuToggle(); }}>
+                            <Link href="/TrackingListPage">
+                                <span className={`text-white ${scrolled ? 'hover:text-gray-300' : 'hover:text-gray-800'}`}>
+                                    Takip Listem ({selectedCurrencies ? selectedCurrencies.length : 0})
+                                </span>
+                            </Link>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </CurrencyProvider>
     );
 };
 

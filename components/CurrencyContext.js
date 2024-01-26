@@ -2,6 +2,7 @@ import React, { createContext, useContext, useReducer } from 'react';
 
 // Action Types
 const ADD_SELECTED_CURRENCY = 'ADD_SELECTED_CURRENCY';
+const REMOVE_SELECTED_CURRENCY = 'REMOVE_SELECTED_CURRENCY';
 
 const reducer = (state, action) => {
     switch (action.type) {
@@ -9,6 +10,11 @@ const reducer = (state, action) => {
             return {
                 ...state,
                 selectedCurrencies: [...state.selectedCurrencies, action.payload],
+            };
+        case REMOVE_SELECTED_CURRENCY:
+            return {
+                ...state,
+                selectedCurrencies: state.selectedCurrencies.filter((c) => c.currency !== action.payload.currency),
             };
         default:
             return state;
@@ -27,18 +33,25 @@ export const useCurrencyContext = () => {
 
 const CurrencyProvider = ({ children }) => {
     const [state, dispatch] = useReducer(reducer, {
-        selectedCurrencies: [], // Buradaki özelliği ekledik
+        selectedCurrencies: [],
     });
+
+    console.log('Currency Provider State:', state);
 
     const addSelectedCurrency = (currency) => {
         dispatch({ type: ADD_SELECTED_CURRENCY, payload: currency });
     };
 
+    const removeSelectedCurrency = (currency) => {
+        dispatch({ type: REMOVE_SELECTED_CURRENCY, payload: currency });
+    };
+
     return (
-        <CurrencyContext.Provider value={{ state, addSelectedCurrency, dispatch }}>
+        <CurrencyContext.Provider value={{ state, addSelectedCurrency, removeSelectedCurrency, dispatch }}>
             {children}
         </CurrencyContext.Provider>
     );
 };
+
 
 export default CurrencyProvider;

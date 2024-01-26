@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useCurrencyContext } from './CurrencyContext';
 
+
+
 const Forex4 = () => {
     const [currencyData, setCurrencyData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -8,11 +10,10 @@ const Forex4 = () => {
     const [hoveredRow, setHoveredRow] = useState(null);
     const [filterOption, setFilterOption] = useState('all'); // 'all', 'rising', 'falling'
     const [sortOrder, setSortOrder] = useState('desc'); // 'asc', 'desc'
-    // const [selectedCurrencies, setSelectedCurrencies] = useState([]);
 
     const { state, dispatch } = useCurrencyContext();
-
     const selectedCurrencies = state.selectedCurrencies
+
 
 
     const fetchData = async () => {
@@ -50,31 +51,29 @@ const Forex4 = () => {
         fetchData();
     }, []);
 
-    // const addSelectedCurrency = (currency) => {
-    //     setSelectedCurrencies((prevCurrencies) => [...prevCurrencies, { ...currency, isStarred: true }]);
-    // };
-
-
-
     const handlePlusClick = (currency) => {
-        // Seçilen döviz birimini ekleyin
-        const updatedCurrencies = state.selectedCurrencies
-            ? [...state.selectedCurrencies, { ...currency, isStarred: true }]
-            : [{ ...currency, isStarred: true }];
-
-        // CurrencyContext dosyasındaki dispatch fonksiyonunu kullanarak güncel durumu iletiyoruz
-        dispatch({
-            type: 'ADD_SELECTED_CURRENCY',
-            payload: updatedCurrencies
-        });
-
-        // Yıldız durumunu toggle et
+        if (state.selectedCurrencies.some((c) => c.currency === currency.currency)) {
+            // Eğer currency zaten seçilmişse, listeden kaldır
+            dispatch({
+                type: 'REMOVE_SELECTED_CURRENCY',
+                payload: currency,
+            });
+        } else {
+            // Eğer currency henüz seçilmemişse, listeye ekle
+            dispatch({
+                type: 'ADD_SELECTED_CURRENCY',
+                payload: { ...currency, isStarred: true },
+            });
+        }
+        console.log('seçilen:', { selectedCurrencies })
         setCurrencyData((prevData) =>
             prevData.map((item) =>
                 item.currency === currency.currency ? { ...item, isStarred: !item.isStarred } : item
             )
         );
     };
+
+
 
     const filteredData = currencyData.filter((currency) => currency.currency.toLowerCase() !== 'update_date');
 
@@ -85,7 +84,7 @@ const Forex4 = () => {
         } else if (filterOption === 'falling') {
             return changeValue.includes('-');
         }
-        return true; // 'all' or unknown filter value
+        return true;
     });
 
     const sortedData = filteredAndSortedData.sort((a, b) => {
@@ -130,9 +129,9 @@ const Forex4 = () => {
         const rowStyles = {
             cursor: 'pointer',
             backgroundColor: index % 2 === 0 ? 'var(--bg-light-gray)' : 'var(--bg-black)',
-            ...(hoveredRow === index && { backgroundColor: 'var(--bg-gray-300)' }),
+            ...(hoveredRow === index && { backgroundColor: 'var(--bg-gray-400)' }),
         };
-        console.log(rowStyles);
+
         return (
             <tr
                 key={index}
@@ -141,17 +140,20 @@ const Forex4 = () => {
                 onMouseLeave={() => handleRowHover(null)}
             >
                 <td className="py-0.5 px-4 border-b text-center text-sm">
-                    <button
-                        className={`text - lg font - semibold ${currency.isStarred ? 'bg-green-500' : 'bg-blue-500'
-                            } p - 2 rounded - md border ml - 2`}
-                        onClick={() => handlePlusClick(currency)}
-                    >
-                        {currency.isStarred ? '★' : '+'}
-                    </button>
+                    <div className="flex items-center justify-center">
+                        <button
+                            className={`text-lg font-semibold ${currency.isStarred ? 'bg-green-500' : 'bg-blue-500'
+                                } p-2 rounded-md border ml-2`}
+                            style={{ width: '30px' }} // Set a fixed width
+                            onClick={() => handlePlusClick(currency)}
+                        >
+                            {currency.isStarred ? '★' : '+'}
+                        </button>
+                    </div>
                 </td>
                 <td className="py-0.5 px-4 border-b text-center text-sm">{currency.currency}</td>
                 <td className="py-0.5 px-4 border-b text-center text-sm">{parseFloat(currency.rate).toFixed(2)}</td>
-                <td className={`py - 1 px - 4 border-b text-center-sm`}>{`${numericChange.toFixed(2)} % `}</td>
+                <td className={`py-1 px-4 border-b text-center-sm`}>{`${numericChange.toFixed(2)} % `}</td>
                 <td className="py-0.5 px-4 border-b text-center text-sm">
                     {numericChange < 0 ? (
                         <span className="text-red-500">&#9660;</span>
@@ -214,7 +216,7 @@ const Forex4 = () => {
                 {Array.from({ length: Math.ceil(sortedData.length / itemsPerPage) }, (_, index) => (
                     <button
                         key={index}
-                        className={`px - 3 py - 1 mx - 1 border rounded - full ${currentPage === index + 1 ? 'bg-blue-500 text-white' : 'hover:bg-gray-200'
+                        className={`px-3 py-1 mx-2 border rounded-full ${currentPage === index + 1 ? 'bg-blue-500 text-white' : 'hover:bg-gray-200'
                             }`}
                         onClick={() => paginate(index + 1)}
                     >
