@@ -59,7 +59,7 @@ const Forex4 = () => {
             addSelectedCurrency(clickedCurrency);
         }
         // Print selected currencies to console
-        console.log('Selected Currencies:', selectedCurrencies);
+        // console.log('Selected Currencies:', selectedCurrencies);
     };
 
     const handlePlusClick = (clickedCurrency) => {
@@ -232,9 +232,6 @@ const Forex4 = () => {
                     <tbody>
                         {selectedCurrencies.map((currency, index) => (
                             <tr key={index}>
-                                <td className="py-0.5 px-4 border-b text-center text-sm font-bold">{currency.currency}</td>
-                                <td className="py-0.5 px-4 border-b text-center text-sm">{parseFloat(currency.rate).toFixed(2)}</td>
-                                <td className={`py-1 px-4 border-b text-center text-sm`}>{`${parseFloat(currency.change).toFixed(2)} % `}</td>
                                 <td className="py-0.5 px-4 border-b text-center text-sm">
                                     <button
                                         className={`text-lg font-semibold p-2 rounded-md border ml-2 ${currency.isStarred ? 'bg-green-500' : 'bg-blue-500'}`}
@@ -243,6 +240,10 @@ const Forex4 = () => {
                                         {currency.isStarred ? '★' : '+'}
                                     </button>
                                 </td>
+                                <td className="py-0.5 px-4 border-b text-center text-sm font-bold">{currency.currency}</td>
+                                <td className="py-0.5 px-4 border-b text-center text-sm">{parseFloat(currency.rate).toFixed(2)}</td>
+                                <td className={`py-1 px-4 border-b text-center text-sm`}>{`${parseFloat(currency.change).toFixed(2)} % `}</td>
+
                             </tr>
                         ))}
                     </tbody>
