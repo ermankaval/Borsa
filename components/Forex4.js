@@ -1,7 +1,7 @@
 // Forex4 component
 import React, { useState, useEffect } from 'react';
 import { useCurrencyContext } from './CurrencyContext';
-import { BiMenu } from 'react-icons/bi';
+
 
 // import { Link } from 'react-router-dom';
 

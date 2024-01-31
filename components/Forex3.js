@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import usFlag from '../public/flags/us_flag.png';
-import euroFlag from '../public/flags/euro_flag.png';
-import gbpFlag from '../public/flags/gbp_flag.png';
-import goldFlag from '../public/flags/gold_flag.png';
+// import usFlag from '../public/flags/us_flag.png';
+// import euroFlag from '../public/flags/euro_flag.png';
+// import gbpFlag from '../public/flags/gbp_flag.png';
+// import goldFlag from '../public/flags/gold_flag.png';
 import LineChart from './LineChart';
 
 const Main = () => {

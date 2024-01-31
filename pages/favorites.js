@@ -1,7 +1,6 @@
 // favorites.js
 import React from 'react';
 import { useCurrencyContext } from '../components/CurrencyContext';
-import Silinecek from '@/components/silinecek';
 import Navbar from '@/components/Navbar';
 
 const Favorites = () => {
@@ -34,7 +33,7 @@ const Favorites = () => {
                 ) : (
                     <p>No favorite currencies selected.</p>
                 )}
-                <Silinecek />
+
             </div>
         </div>
     );
