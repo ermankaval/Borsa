@@ -42,3 +42,36 @@ body {
     font-weight: bold;
     font-size: 20px;
 }
+
+@media (max-width: 640px) {
+    .container {
+        overflow-x: auto;
+    }
+}
+
+.overflow-x-auto {
+    overflow-x: auto;
+}
+
+.max-w-full {
+    max-width: 100%;
+}
+
+table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.button-without-border {
+    background-color: #0066ff;
+    color: #000;
+}
+
+.button-without-border.starred {
+    background-color: #FFD700;
+}
+
+.star {
+    color: #FFD700;
+    /* Yıldız rengi - sarı */
+}

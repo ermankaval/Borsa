@@ -30,9 +30,9 @@ const LineChart = ({ currencyKey, rate, change }) => {
                 const formattedStartDate = startDate.toISOString().slice(0, 10).replace(/[-]/g, '') + '000000';
 
                 const url = `https://web-paragaranti-pubsub.foreks.com/web-services/historical-data?userName=undefined&name=S${currencyKey}&exchange=FREE&market=N&group=F&last=300&period=1440&intraPeriod=null&isLast=false&from=${formattedStartDate}&to=${formattedToday}`;
-                console.log('Fetch URL:', url);
-                console.log(formattedStartDate);
-                console.log(formattedToday);
+                // console.log('Fetch URL:', url);
+                // console.log(formattedStartDate);
+                // console.log(formattedToday);
 
                 const response = await fetch(url);
 
@@ -41,7 +41,7 @@ const LineChart = ({ currencyKey, rate, change }) => {
                 }
 
                 const data = await response.json();
-                console.log('Fetched Data:', data);
+                // console.log('Fetched Data:', data);
 
                 if (data && Array.isArray(data.dataSet) && data.dataSet.length > 0) {
                     const labels = data.dataSet.map((item) => new Date(item.date).toLocaleDateString());
@@ -91,7 +91,6 @@ const LineChart = ({ currencyKey, rate, change }) => {
             type: 'line',
             data: chartData,
             options: {
-
                 plugins: {
                     tooltip: {
                         mode: 'nearest',
@@ -106,12 +105,21 @@ const LineChart = ({ currencyKey, rate, change }) => {
                             },
                         },
                     },
-                    // legend: {
-                    //     display: false,
-                    // },
+                },
+                legend: {
+                    onClick: (e, legendItem) => {
+                        // Prevent the default toggle behavior
+                        e.preventDefault();
+                    },
+                    display: false, // Set display to false to hide the legend
+                },
+                hover: {
+                    mode: 'x',
+                    intersect: false,
                 },
             },
         });
+
 
         return () => {
             myLineChart.destroy();
